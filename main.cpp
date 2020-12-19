@@ -14,7 +14,7 @@ int main(){
 	size_t key;
 	size_t value;
 	int success;
-	///////////////////////////////////build the hash table
+	////////////////////////////////build the hash table
 	clock_t start = clock();
 	while(getline(infile , line)){
 		sdata = split(line , " ");
@@ -119,4 +119,4 @@ vector<string> split(const string &str, const string &pattern)
 
 	return res;
 }
-
+

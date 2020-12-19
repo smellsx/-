@@ -141,8 +141,11 @@ for(size_t i=HASH_SIZE*TABLE_SIZE ; i<(HASH_SIZE+1)*TABLE_SIZE ; i++){
 
 ```
 第一次Insert:  
+
 <img src="https://github.com/smellsx/-/blob/main/images/insert1.PNG" width = "75%">    
+
 第二次Insert:  
+
 <img src="https://github.com/smellsx/-/blob/main/images/insert2.PNG" width = "75%">  
 
 
@@ -160,6 +163,7 @@ hash.Show_all();
 
 ```
 第一次Remove：   
+
 <img src="https://github.com/smellsx/-/blob/main/images/remove1.PNG" width = "75%">      
    
 第二次Remove： 

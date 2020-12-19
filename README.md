@@ -22,9 +22,7 @@
             dmesg | grep user
 <img src="https://github.com/smellsx/-/blob/main/images/NVM02.png" width = "75%">      
 <img src="https://github.com/smellsx/-/blob/main/images/NVM01.png" width = "75%">      
-​                                                                                                                                                                           
-
-
+​                                                                                                                                                                          
 ​    
 
 ### 2.根据PMDK的README安装教程进行库安装

@@ -8,7 +8,7 @@
 #### 2)更新grub:
             sudo update-grub
             reboot
-#### 3)make nconfig
+#### 3)输入指令make nconfig
 #### 4)进入到Device Drivers,并且在其中找到NVDIMN Support(注意NVDIMN Support不在第一页）
 #### 5)配置文件系统DAX
 #### 6)编译以及安装内核

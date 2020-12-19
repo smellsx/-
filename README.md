@@ -149,6 +149,7 @@ hash.Show_all();
 <img src="https://github.com/smellsx/-/blob/main/images/remove1.PNG" width = "75%">      
    
 第二次Remove： 
+
 <img src="https://github.com/smellsx/-/blob/main/images/remove2.PNG" width = "50%">  
 
 

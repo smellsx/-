@@ -3,13 +3,29 @@
 
 
 ### 1.根据[Intel的教程](https://software.intel.com/content/www/us/en/develop/articles/how-to-emulate-persistent-memory-on-an-intel-architecture-server.html)，利用普通内存模拟NVM环境并测试是否配置正确
-
+#### 1)配置grub:
+            vi /etc/default/grub
+#### 2)更新grub:
+            sudo update-grub
+            reboot
+#### 3)make nconfig
+#### 4)进入到Device Drivers,并且在其中找到NVDIMN Support(注意NVDIMN Support不在第一页）
+#### 5)配置文件系统DAX
+#### 6)编译以及安装内核
+            make -j8
+            make modules_install install
+#### 7)打印e820表格
+            dmesg | grep e820
+#### 8)配置以及模拟可持续化内存
+            GRUB_CMDLINE_LINUX="memmap=4G!4G"
+#### 9)使用命令查看是否配置成功
+            dmesg | grep user
+<img src="https://github.com/smellsx/-/blob/main/images/NVM02.png" width = "75%">      
+<img src="https://github.com/smellsx/-/blob/main/images/NVM01.png" width = "75%">      
 ​                                                                                                                                                                           
 
 
 ​    
-
-
 
 ### 2.根据PMDK的README安装教程进行库安装
 #### 1)libdaxctl-devel依赖安装: 
@@ -149,8 +165,6 @@ hash.Show_all();
 <img src="https://github.com/smellsx/-/blob/main/images/remove1.PNG" width = "75%">      
    
 第二次Remove： 
-
-
 
 <img src="https://github.com/smellsx/-/blob/main/images/remove2.PNG" width = "50%">  
 

@@ -33,6 +33,9 @@ PMLHash的主要结构已经在头文件中给出，主要包括元数据，存�
 
 // Hash Table
 | key | value | fill_num | next_offset |
+
+//bitmap 512*64=4K ，开始时全置为0表示所有溢出页面都可用，每用一个将相应位数置为1表示不可用
+|size_t[0] | size_t[1] |... |size_t[512]|  
 ```
 
 ### 操作详解
@@ -126,10 +129,11 @@ for(size_t i = 0 ; i < HASH_SIZE*TABLE_SIZE ; i++ ){
 hash.Show_all();
 
 ```
-第一次Remove：  
+第一次Remove：   
 <img src="https://github.com/smellsx/-/blob/main/images/remove1.PNG" width = "75%">    
-
-第二次Remove：
+  
+   
+第二次Remove： 
 <img src="https://github.com/smellsx/-/blob/main/images/remove2.PNG" width = "75%">  
 
 
@@ -159,7 +163,7 @@ for(size_t i=0 ; i < (HASH_SIZE + 1) * TABLE_SIZE ; i++){
 
 ### 5.自行编写YCSB测试，运行给定的Benchmark数据集并测试OPS(Operations per second)和延迟两个性能指标
 |(有回收溢出空间)| time  | 溢出页面 |  OPS|
-|------| -------|------------| -----------| ----------|  
+|------| -------|------------| -----------|
 |0-100 load+run | 127.168ms+12.618ms| 2145|  791366|
 |25-75 load+run | 110.218ms+10.751ms| 2124|916666|
 |50-50 load+run | 136.775ms+12.087ms| 2497|743243|
@@ -170,7 +174,7 @@ for(size_t i=0 ; i < (HASH_SIZE + 1) * TABLE_SIZE ; i++){
 ------------------------  
 
 |(没有回收溢出空间)| time |溢出页面 |  OPS |
-|------| -------|------------| -----------| ----------|  
+|------| -------|------------| -----------|
 |0-100 load+run | 107.168ms+10.876ms| 6489|  940170| 
 |25-75 load+run | 111.077ms+10.541ms| 6427|909090|
 |50-50 load+run | 109.068ms+10.595ms| 6355|924369|

@@ -34,13 +34,13 @@ PMLHash::PMLHash(const char* file_path) {
 		meta->size = HASH_SIZE;
 		meta->overflow_num = 0;
 		//////////////initial bitmap
-		
+
 		for(int i=0; i<BITMAP ; i++){
 			bitmap[i] = 0;
 		}
 
 		//////////////////////initial table_arr
-		
+
 		pm_table* ptable = NULL;
 		for(int i=0; i<HASH_SIZE; i++){
 			ptable = table_arr + i;
@@ -52,7 +52,11 @@ PMLHash::PMLHash(const char* file_path) {
 			}
 		}
 	//}
-	
+	/////////////////	pmem_persitst it to the persistent memory
+
+	pmem_persist(start_addr , FILE_SIZE);
+
+	/////////////////////end
 
 }
 /**
@@ -90,18 +94,19 @@ void PMLHash::split()
 	size_t N_level  = HASH_SIZE * pow(2 , meta->level);
 	size_t  N_level_plus = HASH_SIZE * pow(2 , meta->level + 1);
 	entry temp;
-	size_t index0=0 , index1=0 , index2=0;
+	pm_table* ptable = NULL;
 	pm_table* spiltTable = table_arr + meta->next;		//split table
 	pm_table* newTable = table_arr + meta->next + N_level; //new table
-	pm_table* p0 = NULL;
-	pm_table* p1 = spiltTable;
-	pm_table* p2 = newTable;
+	vector<entry> spvic;			
+	vector<entry> newvic;
+
 	////////////exception handling
 
 	if( (pm_table*)spiltTable > (pm_table*) overflow_addr || (pm_table*)newTable > (pm_table*)overflow_addr ){
 		perror("virtual address of Hash Table Array over the overflow_addr!\n");
 		exit(1);
 	}
+
 	///////////initial new table
 
 	newTable->fill_num = 0;
@@ -111,60 +116,66 @@ void PMLHash::split()
 		(newTable->kv_arr[i]).value = 0;
 	}
 
-
-	///////split, p1,p0->split_table  , p2->new_table
+	///////delete the split table
 	
-	for(p0 = spiltTable ; p0 ; p0 = pNext(p0->next_offset) ){
+	for(ptable = spiltTable ; ptable ; ptable = pNext(ptable->next_offset) ){
 
-		p0->fill_num = 0;
+		for(size_t i=0; i<TABLE_SIZE; i++){
 
-		for(index0=0 ; index0 < TABLE_SIZE ; index0++){
+			temp = ptable->kv_arr[i];
 
-			temp = p0->kv_arr[index0];
-
-			(p0->kv_arr[index0]).key = 0;		//将这个位置元素归零
-			(p0->kv_arr[index0]).value = 0;
 			if(temp.key != 0){
 
-				if(hashFunc(temp.key , N_level_plus) == meta->next ){	//当元素直还是属于next时候
-
-					if(index1 < TABLE_SIZE){						//没有满
-
-						p1->kv_arr[index1++] = temp;
-						(p1->fill_num)++;
-
-					}else{
-
-						p1 = pNext(p1->next_offset);
-						index1 = 0;
-						p1->kv_arr[index1++] = temp;
-						(p1->fill_num)++;
-
-					}
-
-				}else{			//当元素直属于新的桶时候
-
-					if(index2 < TABLE_SIZE){
-
-						p2->kv_arr[index2++] = temp;
-						(p2->fill_num)++;
-
-					}else{
-						p2 = newOverflowTable(p2->next_offset);
-						index2 = 0;
-						p2->kv_arr[index2++] = temp;
-						(p2->fill_num)++;
-					}
+				if(hashFunc(temp.key , N_level_plus) == meta->next ){
+					spvic.push_back(temp);
+				}else{
+					newvic.push_back(temp);
 				}
+				(ptable->kv_arr[i]).key = 0;
+				(ptable->kv_arr[i]).value = 0;
 
 			}
+
 		}
+
+		ptable->fill_num = 0;
+
+	}
+
+    // fill the split table
+
+	ptable = spiltTable;
+
+	for(size_t i=0;  i<spvic.size() && ptable ; ptable = pNext(ptable->next_offset) ){
+
+		for(size_t j=0; j<TABLE_SIZE && i<spvic.size(); i++,j++ ){
+
+			ptable->kv_arr[j] = spvic[i];
+			(ptable->fill_num)++;
+		}
+
 
 	}
 
 	//recycle the overflow space
 
-	while(Recycle(spiltTable));	
+	Recycle(spiltTable);	
+
+    // fill the new table
+
+	ptable = newTable;
+
+	for(size_t i=0; i< newvic.size();  ){
+
+		for(size_t j=0; j<TABLE_SIZE && i<newvic.size() ;  i++ , j++){
+			ptable->kv_arr[j] = newvic[i];
+			(ptable->fill_num)++;
+		}
+		if( i < newvic.size()){
+			ptable = newOverflowTable(ptable->next_offset);
+		}
+
+	}
 
     // update the next of metadata
 
@@ -177,6 +188,11 @@ void PMLHash::split()
     	(meta->next)++;
     }
 
+    ///////////////persist the data to persistent memeory
+
+	pmem_persist(start_addr , FILE_SIZE);
+
+    ///////////end
 }
 /**
  * PMLHash 
@@ -204,7 +220,6 @@ pm_table* PMLHash:: newOverflowTable(uint64_t &offset)
 {
 
 	size_t index = determine_location(bitmap);
-	//size_t index = meta->overflow_num;
 	offset =  8*1024*1024 + index * sizeof(pm_table);
 	(meta->overflow_num)++;
 
@@ -215,7 +230,7 @@ pm_table* PMLHash:: newOverflowTable(uint64_t &offset)
 		ptable->fill_num = 0;
 		ptable->next_offset = 0;
 		for(size_t i=0; i<TABLE_SIZE ;i++){
-	     	(ptable->kv_arr[i]).key = 0;
+			(ptable->kv_arr[i]).key = 0;
 			(ptable->kv_arr[i]).value = 0;
 		}
 		return ptable;
@@ -305,6 +320,12 @@ int PMLHash::insert(const uint64_t &key, const uint64_t &value)
 		success = 0;
 	}
 
+	///////////////persist the data to persistent memeory
+
+	pmem_persist(start_addr , FILE_SIZE);
+
+	////////////////end
+
 	return success;
 }
 
@@ -339,6 +360,11 @@ void PMLHash:: Getvalue(const uint64_t &key, const uint64_t &value , pm_table* t
 	ptable->kv_arr[i].key = key;
 	ptable->kv_arr[i].value = value;
 	(ptable->fill_num)++;
+	///////////////persist the data to persistent memeory
+
+	pmem_persist(start_addr , FILE_SIZE);
+
+    ///////////end
 }
 
 
@@ -423,6 +449,12 @@ int PMLHash::update(const uint64_t &key, const uint64_t &value)
 		}
 	}
 
+	///////////////persist the data to persistent memeory
+
+	pmem_persist(start_addr , FILE_SIZE);
+
+	/////////end
+
 	return success;
 }
 
@@ -496,6 +528,13 @@ int PMLHash::remove(const uint64_t &key)
 		success = 0;
 	}
 
+
+	///////////////persist the data to persistent memeory
+
+	pmem_persist(start_addr , FILE_SIZE);
+
+	/////////end
+
 	return success;
 }
 
@@ -516,7 +555,7 @@ size_t PMLHash:: determine_location(size_t* arr)
 
                     arr[i] |= bitMask;			//做或运算，将该位置元素置为1
 
-                    //pmem_persist(start_addr , FILE_SIZE);
+                    pmem_persist(start_addr , FILE_SIZE);
 
                     return i*64 + j;			//返回序号数
                 }
@@ -526,7 +565,11 @@ size_t PMLHash:: determine_location(size_t* arr)
         }
 
     }
- 
+    ///////////////persist the data to persistent memeory
+
+	pmem_persist(start_addr , FILE_SIZE);
+
+	/////////end
     return BITMAP*64;		//返回一个最大数，表示空间申请失败
 }
 
@@ -549,10 +592,16 @@ void PMLHash:: set_zero(size_t num,size_t* arr)
 
     arr[i] ^= bitMask;			//做异或操作使对应位数变为0
 
+    ///////////////persist the data to persistent memeory
+
+	pmem_persist(start_addr , FILE_SIZE);
+
+	/////////end
+
 }
 
 
-int PMLHash:: Recycle(pm_table* table_arr)
+void PMLHash:: Recycle(pm_table* table_arr)
 {
 	pm_table* intable = table_arr;
 	pm_table* pretable = NULL;
@@ -574,9 +623,6 @@ int PMLHash:: Recycle(pm_table* table_arr)
 		set_zero(index ,bitmap);
 
 		(meta->overflow_num)--;
-		return 1;
-	}else{
-		return 0;
 	}
 }
 
@@ -615,4 +661,4 @@ void PMLHash:: Show_all()
 
 
 
-
+

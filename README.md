@@ -12,10 +12,14 @@
 
 
 ### 2.根据PMDK的README安装教程进行库安装
-#### 1)libdaxctl-devel依赖安装: sudo apt-get install libdaxctl-dev
-#### 2)pandoc命令安装: sudo apt-get install pandoc
-#### 3)m4命令安装: sudo apt-get install m4
-#### 4)libfabric依赖安装: sudo apt-get install libfabric-dev
+#### 1)libdaxctl-devel依赖安装: 
+            sudo apt-get install libdaxctl-dev
+#### 2)pandoc命令安装: 
+            sudo apt-get install pandoc
+#### 3)m4命令安装: 
+            sudo apt-get install m4
+#### 4)libfabric依赖安装: 
+            sudo apt-get install libfabric-dev
 #### 5)PMDK测试: 
             cp src/test/testconfig.sh.example src/test/testconfig.sh
             make test

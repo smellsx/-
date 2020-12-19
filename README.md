@@ -150,6 +150,8 @@ hash.Show_all();
    
 第二次Remove： 
 
+
+
 <img src="https://github.com/smellsx/-/blob/main/images/remove2.PNG" width = "50%">  
 
 

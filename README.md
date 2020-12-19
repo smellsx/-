@@ -13,12 +13,49 @@
 ### 2.根据PMDK的README安装教程进行库安装
 
 ​                                                                                                                                                                                          
+### 3. PML-Hash设计细节
+
+### 数据结构设计
+PMLHash的主要结构已经在头文件中给出，主要包括元数据，存储的哈希表数组数据以及溢出哈希表数据，默认将所有数据放在一个16MB的文件中存储，结构如下：
+```
+// PMLHash
+| Metadata | Hash Table Array | Overflow Hash Tables |
++---------- 8 MB -------------+------- 8 MB ---------+
+
+// Metadata
+| size | level | next | overflow_num |
+
+// Hash Table Array
+| hash table[0] | hash table[1] | ... | hash table[n] | 
+
+// Overflow Hash Tables
+| hash table[0] | hash table[1] | ... | hash table[m] |
+
+// Hash Table
+| key | value | fill_num | next_offset |
+```
+
+### 操作详解
+#### Insert
+插入操作用于插入一个新的键值对，首先要找到相应的哈希桶，然后插入。插入的时候永远插入第一个空的槽位，维持桶的元素的连续性。可能原本的哈希桶本身已经满了且有溢出桶，那就插入溢出桶。插入后桶满，就出发分裂操作，分裂的桶被metadata中的next标识。
+
+产生新的溢出桶从数据文件的Overflow Hash Tables区域获取空间，其空闲的起始位置可以通过determine_location函数算出
+
+#### Remove
+删除操作用于移除目标键值对，为了位置哈希桶的连续性，采用将移除键值位置后的其他键值向前移动的方式进行覆盖，然后更新桶的fill_num指示桶的最后一个元素位置，达到删除的目的。若删除完该元素后该哈希桶正好为空，就将该桶移除，并通过set_zero函数将位图中相应的位数置为0表示该位可用
+
+
+#### Update
+更新操作修改目标键值对的值，先找到对应的位置，然后修改再persist即可。
+
+#### Search
+查找操作根据给定的键找对应的值然后返回
 
 ​       
 
 
 
-### 3.根据项目框架和需求实现代码并运行，测试每个功能运行并截图相应结果
+### 4.根据项目框架和需求实现代码并运行，测试每个功能运行并截图相应结果
 
 ​      
 
@@ -70,7 +107,9 @@ for(size_t i=HASH_SIZE*TABLE_SIZE ; i<(HASH_SIZE+1)*TABLE_SIZE ; i++){
      cout<<"******************"<<endl;
 
 ```
+第一次Insert:  
 <img src="https://github.com/smellsx/-/blob/main/images/insert1.PNG" width = "75%">    
+第二次Insert:  
 <img src="https://github.com/smellsx/-/blob/main/images/insert2.PNG" width = "75%">  
 
 
@@ -87,9 +126,10 @@ for(size_t i = 0 ; i < HASH_SIZE*TABLE_SIZE ; i++ ){
 hash.Show_all();
 
 ```
-
+第一次Remove：  
 <img src="https://github.com/smellsx/-/blob/main/images/remove1.PNG" width = "75%">    
 
+第二次Remove：
 <img src="https://github.com/smellsx/-/blob/main/images/remove2.PNG" width = "75%">  
 
 
@@ -117,9 +157,9 @@ for(size_t i=0 ; i < (HASH_SIZE + 1) * TABLE_SIZE ; i++){
 
 
 
-### 4.自行编写YCSB测试，运行给定的Benchmark数据集并测试OPS(Operations per second)和延迟两个性能指标
+### 5.自行编写YCSB测试，运行给定的Benchmark数据集并测试OPS(Operations per second)和延迟两个性能指标
 |(有回收溢出空间)| time  | 溢出页面 |  OPS|
-|------| -------|------------| -----------|
+|------| -------|------------| -----------| ----------|  
 |0-100 load+run | 127.168ms+12.618ms| 2145|  791366|
 |25-75 load+run | 110.218ms+10.751ms| 2124|916666|
 |50-50 load+run | 136.775ms+12.087ms| 2497|743243|
@@ -130,7 +170,7 @@ for(size_t i=0 ; i < (HASH_SIZE + 1) * TABLE_SIZE ; i++){
 ------------------------  
 
 |(没有回收溢出空间)| time |溢出页面 |  OPS |
-|------| -------|------------| -----------|
+|------| -------|------------| -----------| ----------|  
 |0-100 load+run | 107.168ms+10.876ms| 6489|  940170| 
 |25-75 load+run | 111.077ms+10.541ms| 6427|909090|
 |50-50 load+run | 109.068ms+10.595ms| 6355|924369|
@@ -139,7 +179,7 @@ for(size_t i=0 ; i < (HASH_SIZE + 1) * TABLE_SIZE ; i++){
 
 
 
-### 5.加分项
+### 6.加分项
 
 
 
@@ -180,4 +220,5 @@ pm_table* PMLHash:: newOverflowTable(uint64_t &offset)
 }
 ```
 
-采用了512*64共4K的空间存储位图，开始时全部置为0,每次要申请一个溢出空间时就调用determin_location获得第一个非零元素的位置，据此来申请溢出空间。每次释放溢出空间就调用set_zero将相应位置置为0.
+采用了512*64共4K的空间存储位图，开始时全部置为0,每次要申请一个溢出空间时就调用determin_location获得第一个非零元素的位置，据此来申请溢出空间。每次释放溢出空间就调用set_zero将相应位置置为0.  
+有测试结果可知，大概回收了三倍左右的溢出页面，效果良好。

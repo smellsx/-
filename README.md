@@ -26,6 +26,12 @@
 
 
 ```C
+
+size_t num[(HASH_SIZE + 1) * TABLE_SIZE];
+
+for(size_t i=0; i<(HASH_SIZE + 1) * TABLE_SIZE ; i++){
+    num[i] = rand() % 999 + 1;
+}
 for(size_t i=0 ; i<HASH_SIZE+1 ; i++){
      	cout<<"insert" <<i<<"*****************"<<endl;
      	for(size_t j=0; j<TABLE_SIZE ; j++){
@@ -45,22 +51,46 @@ for(size_t i=0 ; i<HASH_SIZE+1 ; i++){
 }
 ```
 
-
-
-这里我们给了一个有17个insert和17个remove操作的数据集，然后去执行相应的操作
-
+因结果太长不便显示，此测试结果见上传的附件Insert&Remove.txt中
 
 
 - ####  Insert功能测试
 
+```C
+for (uint64_t i = HASH_SIZE * TABLE_SIZE + 1; 
+          i <= (HASH_SIZE + 1) * TABLE_SIZE; i++) {
+         hash.insert(num[i-1] , num[i-1]);
+}
+     hash.Show_all();
+     cout<<"*******************"<<endl;
+for(size_t i=HASH_SIZE*TABLE_SIZE ; i<(HASH_SIZE+1)*TABLE_SIZE ; i++){
+     	hash.remove(num[i]);
+}
+     hash.Show_all();
+     cout<<"******************"<<endl;
 
-
-<img src="https://github.com/smellsx/-/blob/main/images/insert1.PNG" width = "100%">  
+```
+<img src="https://github.com/smellsx/-/blob/main/images/insert1.PNG" width = "100%">    
+<img src="https://github.com/smellsx/-/blob/main/images/insert2.PNG" width = "100%">  
 
 
 - #### Remove功能测试
+```C
+for(size_t i=HASH_SIZE*TABLE_SIZE ; i<(HASH_SIZE+1)*TABLE_SIZE ; i++){
+     	hash.remove(num[i]);
+}
+hash.Show_all();
+cout<<"******************"<<endl;
+for(size_t i = 0 ; i < HASH_SIZE*TABLE_SIZE ; i++ ){
+     	hash.remove(num[i]);
+}
+hash.Show_all();
 
+```
 
+<img src="https://github.com/smellsx/-/blob/main/images/remove1.PNG" width = "100%">    
+
+<img src="https://github.com/smellsx/-/blob/main/images/remove2.PNG" width = "100%">  
 
 
 #### 测试代码 Search
@@ -78,17 +108,9 @@ for(size_t i=0 ; i < (HASH_SIZE + 1) * TABLE_SIZE ; i++){
      	}
 }
 ```
+因结果太长不便显示，此测试结果见上传的附件Search.txt中
 
 
-
-- #### Search功能测试
-
-
-
-
-
-
-- #### Update功能测试
 
 
   

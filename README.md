@@ -6,11 +6,22 @@
 
 ​                                                                                                                                                                           
 
+
 ​    
 
 
 
 ### 2.根据PMDK的README安装教程进行库安装
+#### 1)libdaxctl-devel依赖安装: sudo apt-get install libdaxctl-dev
+#### 2)pandoc命令安装: sudo apt-get install pandoc
+#### 3)m4命令安装: sudo apt-get install m4
+#### 4)libfabric依赖安装: sudo apt-get install libfabric-dev
+#### 5)PMDK测试: cp src/test/testconfig.sh.example src/test/testconfig.sh
+####                        make test
+####                        make check
+#### 测试结果：
+<img src="https://github.com/smellsx/-/blob/main/images/test1.PNG" width = "75%">    
+
 
 ​                                                                                                                                                                                          
 ### 3. PML-Hash设计细节
@@ -73,21 +84,21 @@ for(size_t i=0; i<(HASH_SIZE + 1) * TABLE_SIZE ; i++){
     num[i] = rand() % 999 + 1;
 }
 for(size_t i=0 ; i<HASH_SIZE+1 ; i++){
-     	cout<<"insert" <<i<<"*****************"<<endl;
-     	for(size_t j=0; j<TABLE_SIZE ; j++){
-     		hash.insert( num[i*HASH_SIZE + j]  , num[i*HASH_SIZE + j] );
-     	}
-     	hash.Show_all();
-     	cout<<endl;
+         cout<<"insert" <<i<<"*****************"<<endl;
+         for(size_t j=0; j<TABLE_SIZE ; j++){
+             hash.insert( num[i*HASH_SIZE + j]  , num[i*HASH_SIZE + j] );
+         }
+         hash.Show_all();
+         cout<<endl;
 }
      
 for(size_t i=0 ; i<HASH_SIZE+1 ; i++){
-     	cout<<"remove" <<i<<"*****************"<<endl;
-     	for(size_t j=0; j<TABLE_SIZE ; j++){
-     		hash.remove( num[i*HASH_SIZE + j] );
-     	}
-     	hash.Show_all();
-     	cout<<endl;
+         cout<<"remove" <<i<<"*****************"<<endl;
+         for(size_t j=0; j<TABLE_SIZE ; j++){
+             hash.remove( num[i*HASH_SIZE + j] );
+         }
+         hash.Show_all();
+         cout<<endl;
 }
 ```
 
@@ -104,7 +115,7 @@ for (uint64_t i = HASH_SIZE * TABLE_SIZE + 1;
      hash.Show_all();
      cout<<"*******************"<<endl;
 for(size_t i=HASH_SIZE*TABLE_SIZE ; i<(HASH_SIZE+1)*TABLE_SIZE ; i++){
-     	hash.remove(num[i]);
+         hash.remove(num[i]);
 }
      hash.Show_all();
      cout<<"******************"<<endl;
@@ -119,12 +130,12 @@ for(size_t i=HASH_SIZE*TABLE_SIZE ; i<(HASH_SIZE+1)*TABLE_SIZE ; i++){
 - #### Remove功能测试
 ```C
 for(size_t i=HASH_SIZE*TABLE_SIZE ; i<(HASH_SIZE+1)*TABLE_SIZE ; i++){
-     	hash.remove(num[i]);
+         hash.remove(num[i]);
 }
 hash.Show_all();
 cout<<"******************"<<endl;
 for(size_t i = 0 ; i < HASH_SIZE*TABLE_SIZE ; i++ ){
-     	hash.remove(num[i]);
+         hash.remove(num[i]);
 }
 hash.Show_all();
 
@@ -141,14 +152,14 @@ hash.Show_all();
 
 ```C
 for(size_t i=0 ; i < (HASH_SIZE + 1) * TABLE_SIZE ; i++){
-     	size_t val;
-     	hash.search(num[i] , val);
-     	cout<<"******"<<endl;
-     	cout << "key: " << num[i] << "\nvalue: " << val << endl;
-     	if(num[i] != val){
-     		cout<<"error!"<<endl;
-     		break;
-     	}
+         size_t val;
+         hash.search(num[i] , val);
+         cout<<"******"<<endl;
+         cout << "key: " << num[i] << "\nvalue: " << val << endl;
+         if(num[i] != val){
+             cout<<"error!"<<endl;
+             break;
+         }
 }
 ```
 因结果太长不便显示，此测试结果见上传的附件Search.txt中
@@ -197,29 +208,29 @@ void set_zero(size_t num,size_t* arr);  //将给定位置的元素在位图中�
 pm_table* PMLHash:: newOverflowTable(uint64_t &offset)
 {
 
-	size_t index = determine_location(bitmap);
-	//size_t index = meta->overflow_num;
-	offset =  8*1024*1024 + index * sizeof(pm_table);
-	(meta->overflow_num)++;
+    size_t index = determine_location(bitmap);
+    //size_t index = meta->overflow_num;
+    offset =  8*1024*1024 + index * sizeof(pm_table);
+    (meta->overflow_num)++;
 
 
-	if( offset + sizeof(pm_table) < FILE_SIZE ){
+    if( offset + sizeof(pm_table) < FILE_SIZE ){
 
-		pm_table* ptable = (pm_table*)( (char*)start_addr + offset );
-		ptable->fill_num = 0;
-		ptable->next_offset = 0;
-		for(size_t i=0; i<TABLE_SIZE ;i++){
-	     	(ptable->kv_arr[i]).key = 0;
-			(ptable->kv_arr[i]).value = 0;
-		}
-		return ptable;
+        pm_table* ptable = (pm_table*)( (char*)start_addr + offset );
+        ptable->fill_num = 0;
+        ptable->next_offset = 0;
+        for(size_t i=0; i<TABLE_SIZE ;i++){
+             (ptable->kv_arr[i]).key = 0;
+            (ptable->kv_arr[i]).value = 0;
+        }
+        return ptable;
 
-	}else{
+    }else{
 
-		perror(" the space of overflow is over!\n");
-		exit(1);
+        perror(" the space of overflow is over!\n");
+        exit(1);
 
-	}
+    }
 }
 ```
 

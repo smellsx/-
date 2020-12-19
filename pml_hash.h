@@ -74,9 +74,9 @@ public:
 
     void set_zero(size_t num,size_t* arr);
 
-    int Recycle(pm_table* table_arr);          //recycle the overflow space
+    int Recycle(pm_table* table_arr);          ////recycle the overflow space
 
     void Show_one(pm_table* ptable_arr);
 
     void Show_all();
-};
+};

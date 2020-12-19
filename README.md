@@ -20,7 +20,7 @@
 ####                        make test
 ####                        make check
 #### 测试结果：
-<img src="https://github.com/smellsx/-/blob/main/images/test1.PNG" width = "75%">    
+<img src="https://github.com/smellsx/-/blob/main/images/test1.png" width = "75%">    
 
 
 ​                                                                                                                                                                                          

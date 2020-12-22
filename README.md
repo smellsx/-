@@ -1,7 +1,9 @@
-# 数据库实验报告   小组成员：柴百里_18341004 王圣汐_18341034 张爽_18341047
+# 数据库实验报告   
+####小组成员：柴百里_18341004 王圣汐_18341034 张爽_18341047
 
-
-
+####[仓库地址](https://github.com/smellsx/-.git)
+###0.实验环境
+ubuntu20.0 , 虚拟机使用VM_Ware_Player
 ### 1.根据[Intel的教程](https://software.intel.com/content/www/us/en/develop/articles/how-to-emulate-persistent-memory-on-an-intel-architecture-server.html)，利用普通内存模拟NVM环境并测试是否配置正确
 #### 1)配置grub:
             vi /etc/default/grub
@@ -42,7 +44,17 @@
 <img src="https://github.com/smellsx/-/blob/main/images/test1.png" width = "75%">    
 
 
-​                                                                                                                                                                                          
+​配置好了NVM空间,PMDK库后在程序开始时输入如下指令以便可以使用：
+```Markdown
+    ##挂载
+	sudo mkfs.ext4 /dev/pmem0
+	sudo mount -o dax /dev/pmem0 /mnt/pmemdir
+
+    ##更改权限
+        sudo touch /mnt/pmemdir/pmem0
+        sudo chmod 777 /mnt/pmemdir/pmem0
+```
+                                                                                                                                                                                       
 ### 3. PML-Hash设计细节
 
 ### 数据结构设计

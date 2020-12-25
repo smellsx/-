@@ -45,6 +45,9 @@ ubuntu20.0 , 虚拟机使用VM_Ware_Player
             sudo apt-get install m4
 #### 4)libfabric依赖安装: 
             sudo apt-get install libfabric-dev
+
+<img src="https://github.com/smellsx/-/blob/main/images/PMDK_1.png" width = "75%">
+
 #### 5)PMDK测试: 
             cp src/test/testconfig.sh.example src/test/testconfig.sh
             make test

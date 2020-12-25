@@ -13,6 +13,9 @@ ubuntu20.0 , 虚拟机使用VM_Ware_Player
 #### 2)更新grub:
             sudo update-grub
             reboot
+
+<img src="https://github.com/smellsx/-/blob/main/images/persistent_memory_2.png" width = "75%">
+
 #### 3)输入指令make nconfig
 #### 4)进入到Device Drivers,并且在其中找到NVDIMN Support(注意NVDIMN Support不在第一页）
 #### 5)配置文件系统DAX

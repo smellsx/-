@@ -24,6 +24,9 @@ ubuntu20.0 , 虚拟机使用VM_Ware_Player
             make modules_install install
 #### 7)打印e820表格
             dmesg | grep e820
+
+<img src="https://github.com/smellsx/-/blob/main/images/persistent_memory_3.png" width = "75%">
+
 #### 8)配置以及模拟可持续化内存
             GRUB_CMDLINE_LINUX="memmap=4G!4G"
 #### 9)使用命令查看是否配置成功

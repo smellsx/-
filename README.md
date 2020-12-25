@@ -8,7 +8,7 @@ ubuntu20.0 , 虚拟机使用VM_Ware_Player
 #### 1)配置grub:
             vi /etc/default/grub
 <img src="https://github.com/smellsx/-/blob/main/images/persistent_memory_1.png" width = "75%">  
-#### 2)更新grub:
+2)更新grub:
             sudo update-grub
             reboot
 #### 3)输入指令make nconfig

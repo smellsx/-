@@ -4,7 +4,7 @@
 #### [仓库地址](https://github.com/smellsx/-.git)  
 #### 0.实验环境  
 ubuntu20.0 , 虚拟机使用VM_Ware_Player
-#### 1.根据[Intel的教程](https://software.intel.com/content/www/us/en/develop/articles/how-to-emulate-persistent-memory-on-an-intel-architecture-server.html)，利用普通内存模拟NVM环境并测试是否配置正确
+### 1.根据[Intel的教程](https://software.intel.com/content/www/us/en/develop/articles/how-to-emulate-persistent-memory-on-an-intel-architecture-server.html)，利用普通内存模拟NVM环境并测试是否配置正确
 #### 1)配置grub:
             vi /etc/default/grub
 <img src="https://github.com/smellsx/-/blob/main/images/persistent_memory_1.png" width = "75%">  

@@ -1,6 +1,6 @@
 # 数据库实验报告    
 #### 小组成员：柴百里_18341004 王圣汐_18341034 张爽_18341047
-#### github_name:Monaco12138 smell_sx iridescent-star
+#### username: Monaco12138 smell_sx iridescent-star
 
 #### [仓库地址](https://github.com/smellsx/-.git)  
 #### 0.实验环境  
